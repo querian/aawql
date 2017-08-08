@@ -4,12 +4,6 @@ import (
 	"database/sql/driver"
 	"io"
 	"net/http"
-	"time"
-)
-
-const (
-	tokenExpiryDelta    = 10 * time.Second
-	tokenExpiryDuration = 60 * time.Minute
 )
 
 // Conn represents a connection to a database and implements driver.Conn.

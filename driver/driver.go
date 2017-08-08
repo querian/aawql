@@ -28,6 +28,10 @@ var (
 	httpClientsLock sync.Mutex
 )
 
+func init() {
+	httpClients = make(map[string]*http.Client)
+}
+
 // Driver implements all methods to pretend as a sql database driver.
 type Driver struct {
 	client *http.Client
@@ -81,7 +85,7 @@ func unmarshal(dsn string) (conn *Conn, err error) {
 
 	var c *http.Client
 
-	clientName := val.Get("http_client")
+	httpClient := val.Get("http_client")
 	accessToken := val.Get("access_token")
 	refreshToken := val.Get("refresh_token")
 	developerToken := val.Get("developer_token")
@@ -100,12 +104,12 @@ func unmarshal(dsn string) (conn *Conn, err error) {
 	}
 
 	switch {
-	case clientName != "":
+	case httpClient != "":
 		httpClientsLock.Lock()
-		c = httpClients[clientName]
+		c = httpClients[httpClient]
 		httpClientsLock.Unlock()
 		if c == nil {
-			err = fmt.Errorf("no http client with the name %q", clientName)
+			err = fmt.Errorf("no http client with the name %q", httpClient)
 			return
 		}
 	case accessToken != "":
@@ -132,8 +136,8 @@ func unmarshal(dsn string) (conn *Conn, err error) {
 		c = awql.NewClient(ctx, conf.TokenSource(ctx, &oauth2.Token{RefreshToken: refreshToken}), developerToken)
 	}
 
-	conn.client = c
 	conn = &Conn{}
+	conn.client = c
 
 	var adwordsID string
 	if adwordsID = val.Get("adwords_id"); adwordsID == "" {

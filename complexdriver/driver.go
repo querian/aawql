@@ -61,11 +61,10 @@ func (d *AdvancedDriver) Open(dsn string) (conn driver.Conn, err error) {
 	var c *cache.Cache
 	if useCache {
 		// Initializes the cache to save result sets inside.
-		ttl := 10 * time.Minute
 		if cacheDuration == 0 {
-			ttl = 24 * time.Hour
+			cacheDuration = 24 * time.Hour
 		}
-		c := cache.New(cacheDir, ttl)
+		c := cache.New(cacheDir, cacheDuration)
 		// TODO make file/goroutine safe
 		c.FlushAll()
 	}

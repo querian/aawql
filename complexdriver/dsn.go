@@ -3,7 +3,7 @@ package complexdriver
 import (
 	"strconv"
 
-	awql "github.com/rvflash/awql-driver"
+	awql "github.com/mrsinham/aawql/driver"
 )
 
 // Dsn represents a data source name.

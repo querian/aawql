@@ -517,15 +517,20 @@ func (s *SelectStmt) Query() (driver.Rows, error) {
 
 	// Tries to retrieve data in cache.
 	var records [][]string
-	if records, err = s.fc.Get(s.Hash()); err != nil {
-		// Requests the Adwords API without any args, binding already done.
-		var rows driver.Rows
+	var rows driver.Rows
+	// TODO: refactor this
+	if s.fc != nil {
+		if records, err = s.fc.Get(s.Hash()); err != nil {
+			// Requests the Adwords API without any args, binding already done.
+
+			// Saves the data in cache.
+			go s.fc.Set(&cache.Item{Key: s.Hash(), Value: records})
+		}
+	} else {
 		if rows, err = s.si.Query(nil); err != nil {
 			return nil, err
 		}
 		records = rows.(*awql.Rows).Data
-		// Saves the data in cache.
-		go s.fc.Set(&cache.Item{Key: s.Hash(), Value: records})
 	}
 
 	// Aggregates rows by columns if needed.
