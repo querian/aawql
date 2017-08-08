@@ -141,6 +141,8 @@ func unmarshal(dsn string) (conn *Conn, err error) {
 		return
 	}
 
+	conn.adwordsID = adwordsID
+
 	var includeZeroImpressions bool
 	if val.Get("zero_impression") == "1" {
 		includeZeroImpressions = true

@@ -51,7 +51,7 @@ func (d *AdvancedDriver) Open(dsn string) (conn driver.Conn, err error) {
 	if cacheDir = val.Get("cache_dir"); cacheDir != "" && val.Get("cache") == "1" {
 		useCache = true
 		if cd := val.Get("cache_duration"); cd != "" {
-			if cacheDuration, err = time.ParseDuration(); err != nil {
+			if cacheDuration, err = time.ParseDuration(cd); err != nil {
 				err = errors.New("invalid duration")
 				return
 			}
@@ -70,14 +70,15 @@ func (d *AdvancedDriver) Open(dsn string) (conn driver.Conn, err error) {
 		c.FlushAll()
 	}
 
-
+	// path where the user definition are stored
+	databaseDir := val.Get("database_dir")
 
 	// Loads all information about the database.
-	awqlDb, err := db.Open(v + "|" + dbd)
+	awqlDb, err := db.Open(val.Get("version") + "|" + databaseDir)
 	if err != nil {
 		return nil, err
 	}
-	return &Conn{cn: conn.(*awql.Conn), fc: c, db: awqlDb, id: id}, nil
+	return &Conn{cn: conn.(*awql.Conn), fc: c, db: awqlDb, id: val.Get("adwords_id")}, nil
 }
 
 // Conn represents a connection to a database and implements driver.Conn.
