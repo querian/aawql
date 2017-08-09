@@ -31,16 +31,20 @@ func init() {
 // @example /data/base/dir:/cache/dir:false|123-456-7890:v201607:true|dEve1op3er7okeN|1234567890-c1i3n7iD.com|c1ien753cr37|1/R3Fr35h-70k3n
 func (d *AdvancedDriver) Open(dsn string) (conn driver.Conn, err error) {
 
-	// init underlying driver
-	// Wraps the Awql driver.
-	dd := &awql.Driver{}
-	conn, err = dd.Open(dsn)
+	var val url.Values
+	val, err = awql.ParseDSN(dsn)
 	if err != nil {
 		return
 	}
 
-	var val url.Values
-	val, err = awql.ParseDSN(dsn)
+	if val.Get("skip_column_header") != "1" {
+		val.Set("skip_column_header", "1")
+	}
+
+	// init underlying driver
+	// Wraps the Awql driver.
+	dd := &awql.Driver{}
+	conn, err = dd.Open("adwords?" + val.Encode())
 	if err != nil {
 		return
 	}

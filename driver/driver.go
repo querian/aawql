@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"database/sql/driver"
-	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -161,8 +160,7 @@ func unmarshal(dsn string) (conn *Conn, err error) {
 	}
 	var version string
 	if version = val.Get("version"); version == "" {
-		err = errors.New("version is empty")
-		return
+		version = APIVersion
 	}
 
 	conn.opts = NewOpts(version, includeZeroImpressions, skipColumnHeader, rawEnumValues)

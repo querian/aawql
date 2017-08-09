@@ -522,7 +522,10 @@ func (s *SelectStmt) Query() (driver.Rows, error) {
 	if s.fc != nil {
 		if records, err = s.fc.Get(s.Hash()); err != nil {
 			// Requests the Adwords API without any args, binding already done.
-
+			if rows, err = s.si.Query(nil); err != nil {
+				return nil, err
+			}
+			records = rows.(*awql.Rows).Data
 			// Saves the data in cache.
 			go s.fc.Set(&cache.Item{Key: s.Hash(), Value: records})
 		}
@@ -541,7 +544,7 @@ func (s *SelectStmt) Query() (driver.Rows, error) {
 	// Initialises the result set.
 	size := len(data)
 	if size == 0 {
-		return nil, nil
+		return &Rows{}, nil
 	}
 	rs := &Rows{
 		cols: fieldNames(stmt.Columns(), colSize),
