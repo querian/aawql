@@ -68,7 +68,7 @@ func (d *AdvancedDriver) Open(dsn string) (conn driver.Conn, err error) {
 		if cacheDuration == 0 {
 			cacheDuration = 24 * time.Hour
 		}
-		c := cache.New(cacheDir, cacheDuration)
+		c = cache.New(cacheDir, cacheDuration)
 		// TODO make file/goroutine safe
 		c.FlushAll()
 	}

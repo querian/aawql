@@ -10,6 +10,10 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"fmt"
+	"io"
+	"sync"
 )
 
 // File extension.
@@ -44,6 +48,7 @@ func (d *Item) name() string {
 type Cache struct {
 	dir    string
 	maxAge time.Duration
+	lock   sync.Mutex
 }
 
 // New returns an instance of Cache.
@@ -58,6 +63,8 @@ func (c *Cache) Add(d *Item) error {
 	if err != nil {
 		return ErrNotStored
 	}
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	if _, err = os.Stat(path); err == nil {
 		return ErrNotStored
 	}
@@ -130,6 +137,8 @@ func (c *Cache) Replace(d *Item) error {
 	if err != nil {
 		return ErrNotStored
 	}
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	if _, err = os.Stat(path); os.IsNotExist(err) {
 		return ErrNotStored
 	}
@@ -139,7 +148,10 @@ func (c *Cache) Replace(d *Item) error {
 // Set writes the given item, unconditionally.
 // ErrNotStored is returned if we can not create a file into this directory.
 func (c *Cache) Set(d *Item) error {
-	return c.write(d)
+	c.lock.Lock()
+	err := c.write(d)
+	c.lock.Unlock()
+	return err
 }
 
 // filePath returns the absolute path for this file name or an error.
@@ -184,6 +196,8 @@ func (c *Cache) remove(d *Item) error {
 	if err != nil {
 		return ErrCacheMiss
 	}
+	c.lock.Lock()
+	defer c.lock.Unlock()
 	if _, err = os.Stat(path); os.IsNotExist(err) {
 		return ErrCacheMiss
 	}
@@ -191,26 +205,51 @@ func (c *Cache) remove(d *Item) error {
 }
 
 // write saves the value in a file named using the key.
-func (c *Cache) write(d *Item) error {
-	path, err := c.filePath(d)
+func (c *Cache) write(d *Item) (err error) {
+
+	defer func() {
+		if err != nil {
+			err = fmt.Errorf("item not store: %v", err)
+		}
+	}()
+
+	var path string
+	path, err = c.filePath(d)
 	if err != nil {
-		return ErrNotStored
+		return
 	}
 
 	// Tries to open it.
-	f, err := os.Create(path)
+	var f io.WriteCloser
+	f, err = os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
 	if err != nil {
-		return ErrNotStored
+		if os.IsNotExist(err) {
+			var dirabs string
+			dirabs, err = filepath.Abs(c.dir)
+			if err != nil {
+				return
+			}
+			err = os.MkdirAll(dirabs, 0700)
+			if err != nil {
+				return
+			}
+			f, err = os.OpenFile(path, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0600)
+			if err != nil {
+				return
+			}
+		} else {
+			return
+		}
 	}
 	defer f.Close()
 
 	// Saves all lines into the given file.
 	w := csv.NewWriter(f)
-	if err := w.WriteAll(d.Value); err != nil {
-		return ErrNotStored
+	if err = w.WriteAll(d.Value); err != nil {
+		return
 	}
-	if err := w.Error(); err != nil {
-		return ErrNotStored
+	if err = w.Error(); err != nil {
+		return
 	}
 	return nil
 }
