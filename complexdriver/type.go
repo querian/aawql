@@ -3,17 +3,16 @@ package complexdriver
 import (
 	"fmt"
 	"strconv"
-
-	"github.com/davecgh/go-spew/spew"
 )
 
+// NullPercent records the nil information in awql
 type NullPercent struct {
 	Valid   bool
 	Percent float64
 }
 
+// Scan reads the value
 func (n *NullPercent) Scan(src interface{}) error {
-	spew.Dump(src)
 	if s, ok := src.(string); ok {
 		if s == " --" {
 			return nil
