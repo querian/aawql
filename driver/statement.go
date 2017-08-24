@@ -92,23 +92,28 @@ func (s *Stmt) Query(args []driver.Value) (driver.Rows, error) {
 	if err := s.Bind(args); err != nil {
 		return nil, err
 	}
-	// Saves response in a file named with the hash64 of the query.
-	f, err := s.filePath()
+
+	f, err := ioutil.TempFile(os.TempDir(), "awql_dl_")
 	if err != nil {
 		return nil, err
 	}
+
+	defer func() {
+		_ = f.Close()
+		_ = os.Remove(f.Name())
+	}()
+
 	// Downloads the report
 	if err := s.download(f); err != nil {
 		return nil, err
 	}
-	// Parse the CSV report.
-	d, err := os.Open(f)
+
+	_, err = f.Seek(0, 0)
 	if err != nil {
 		return nil, err
 	}
-	defer d.Close()
 
-	rs, err := csv.NewReader(d).ReadAll()
+	rs, err := csv.NewReader(f).ReadAll()
 	if err != nil {
 		return nil, err
 	}
@@ -124,7 +129,7 @@ func (s *Stmt) Query(args []driver.Value) (driver.Rows, error) {
 }
 
 // download calls Adwords API and saves response in a file.
-func (s *Stmt) download(name string) error {
+func (s *Stmt) download(saveTo io.Writer) error {
 	rq, err := http.NewRequest(
 		"POST", apiURL+s.Db.opts.Version,
 		strings.NewReader(url.Values{"__rdquery": {s.SrcQuery}, "__fmt": {apiFmt}}.Encode()),
@@ -164,14 +169,7 @@ func (s *Stmt) download(name string) error {
 		}
 	}
 
-	// Saves response in a file
-	out, err := os.Create(name)
-	if err != nil {
-		return err
-	}
-	defer out.Close()
-
-	_, err = io.Copy(out, resp.Body)
+	_, err = io.Copy(saveTo, resp.Body)
 	return err
 }
 
