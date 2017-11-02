@@ -3,7 +3,9 @@ package complexdriver
 import (
 	"database/sql"
 	"database/sql/driver"
+	"fmt"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -49,6 +51,39 @@ func (n PercentNullFloat64) Value() (driver.Value, error) {
 		return v + "%", nil
 	}
 	return v, nil
+}
+
+// Scan implements the driver Scanner interface.
+func (n *PercentNullFloat64) Scan(d interface{}) (err error) {
+	s, ok := d.(string)
+	if !ok {
+		return fmt.Errorf("unknow value %q", d)
+	}
+	if s == doubleDash {
+		return nil
+	}
+	if n.Percent = strings.HasSuffix(s, "%"); n.Percent {
+		s = strings.TrimSuffix(s, "%")
+	}
+	switch s {
+	case almost10:
+		// Sometimes, when it's less than 10, Google displays "< 10%".
+		n.NullFloat64.Float64 = 9.999
+		n.NullFloat64.Valid = true
+		n.Almost = true
+	case almost90:
+		// Or "> 90%" when it is the opposite.
+		n.NullFloat64.Float64 = 90.001
+		n.NullFloat64.Valid = true
+		n.Almost = true
+	default:
+		s = strings.Replace(s, ",", "", -1)
+		n.NullFloat64.Float64, err = strconv.ParseFloat(s, 64)
+		if err == nil {
+			n.NullFloat64.Valid = true
+		}
+	}
+	return err
 }
 
 // AutoExcludedNullInt64 represents a int64 that may be null or defined as auto valuer.
