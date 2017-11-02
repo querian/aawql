@@ -10,7 +10,8 @@ import (
 	"sync"
 	"time"
 
-	awql "github.com/mrsinham/aawql/net/oauth2"
+	awql "github.com/querian/aawql/net/oauth2"
+
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 )

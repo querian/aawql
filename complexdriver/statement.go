@@ -11,10 +11,11 @@ import (
 	"unicode/utf8"
 
 	"github.com/jinzhu/now"
-	cache "github.com/mrsinham/aawql/csvcache"
-	db "github.com/mrsinham/aawql/db"
-	awql "github.com/mrsinham/aawql/driver"
-	parser "github.com/mrsinham/aawql/parser"
+
+	cache "github.com/querian/aawql/csvcache"
+	db "github.com/querian/aawql/db"
+	awql "github.com/querian/aawql/driver"
+	parser "github.com/querian/aawql/parser"
 )
 
 // Stmt is a prepared statement.
