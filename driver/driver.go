@@ -134,11 +134,11 @@ func unmarshal(dsn string) (conn *Conn, err error) {
 			Endpoint:     google.Endpoint,
 		}
 		c = awql.NewClient(ctx, conf.TokenSource(ctx, &oauth2.Token{RefreshToken: refreshToken}), developerToken)
+		c.Timeout = apiTimeout
 	}
 
 	conn = &Conn{}
 	conn.client = c
-	conn.client.Timeout = apiTimeout
 
 	var adwordsID string
 	if adwordsID = val.Get("adwords_id"); adwordsID == "" {
