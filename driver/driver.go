@@ -138,6 +138,7 @@ func unmarshal(dsn string) (conn *Conn, err error) {
 
 	conn = &Conn{}
 	conn.client = c
+	conn.client.Timeout = apiTimeout
 
 	var adwordsID string
 	if adwordsID = val.Get("adwords_id"); adwordsID == "" {
