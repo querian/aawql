@@ -60,6 +60,10 @@ func (n *PercentNullFloat64) Scan(d interface{}) (err error) {
 		return fmt.Errorf("unknow value %q", d)
 	}
 	if s == doubleDash {
+		n.NullFloat64.Float64 = 0.0
+		n.NullFloat64.Valid = false
+		n.Almost = false
+		n.Percent = false
 		return
 	}
 	if n.Percent = strings.HasSuffix(s, "%"); n.Percent {
@@ -77,6 +81,7 @@ func (n *PercentNullFloat64) Scan(d interface{}) (err error) {
 		n.NullFloat64.Valid = true
 		n.Almost = true
 	default:
+		n.Almost = false
 		s = strings.Replace(s, ",", "", -1)
 		n.NullFloat64.Float64, err = strconv.ParseFloat(s, 64)
 		if err == nil {
