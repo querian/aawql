@@ -18,7 +18,7 @@ import (
 
 // Data source name.
 const (
-	APIVersion = "v201705"
+	APIVersion = "v201710"
 	DsnSep     = "|"
 	DsnOptSep  = ":"
 )
@@ -69,9 +69,9 @@ func (d *Driver) Open(dsn string) (driver.Conn, error) {
 
 // parseDsn returns an pointer to an Conn by parsing a DSN string.
 // It throws an error on fails to parse it.
-// dsn example : adwords?access_token=xxx&developer_token=xxxx&timeout=3s&version=201705
-// dsn example : adwords?http_client=twenga&version=201706 : read the http client into the map
-// dsn example : adwords?refresh_token=xxxx&client_id=xxxx&client_secret=xxxx&developper_token=xxxx&version=201705
+// dsn example : adwords?access_token=xxx&developer_token=xxxx&timeout=3s&version=v201710
+// dsn example : adwords?http_client=twenga&version=v201710 : read the http client into the map
+// dsn example : adwords?refresh_token=xxxx&client_id=xxxx&client_secret=xxxx&developper_token=xxxx&version=v201710
 // possible param :
 // * zero_impression=1
 // * raw_enum=1
