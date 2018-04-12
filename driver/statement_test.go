@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/rvflash/awql-driver"
+	awql "github.com/querian/aawql/driver"
 )
 
 // TestStmt_Bind tests the method Bind.

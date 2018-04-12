@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	awql "github.com/rvflash/awql-driver"
+	awql "github.com/querian/aawql/driver"
 )
 
 var rowsTests = []struct {

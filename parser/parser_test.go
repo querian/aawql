@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	awql "github.com/rvflash/awql-parser"
+	awql "github.com/querian/aawql/parser"
 )
 
 // Ensure the parser can parse statements correctly.

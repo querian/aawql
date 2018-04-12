@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	awql "github.com/rvflash/awql-parser"
+	awql "github.com/querian/aawql/parser"
 )
 
 // Ensure the scanner can scan tokens correctly.
