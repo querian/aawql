@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	awql "github.com/rvflash/awql-parser"
+	awql "github.com/querian/aawql/parser"
 )
 
 func TestSelectStmt_String(t *testing.T) {
