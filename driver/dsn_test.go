@@ -3,7 +3,7 @@ package driver_test
 import (
 	"testing"
 
-	"github.com/rvflash/awql-driver"
+	awql "github.com/querian/aawql/driver"
 )
 
 // TestNewDsn tests the NewDsn struct

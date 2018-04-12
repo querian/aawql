@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/rvflash/csv-cache"
+	"github.com/querian/aawql/csvcache"
 )
 
 func TestCache_Workflow(t *testing.T) {

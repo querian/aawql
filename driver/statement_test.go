@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/rvflash/awql-driver"
+	awql "github.com/querian/aawql/driver"
 )
 
 // TestStmt_Bind tests the method Bind.
@@ -99,7 +99,7 @@ func TestStmt_NumInput(t *testing.T) {
 	}
 	for i, st := range stmtTests {
 		if st.s.NumInput() != st.n {
-			t.Errorf("%d. Expected %s inputs, received %v", i, st.s.NumInput(), st.n)
+			t.Errorf("%d. Expected %d inputs, received %v", i, st.s.NumInput(), st.n)
 		}
 	}
 }
